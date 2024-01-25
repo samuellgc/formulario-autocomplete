@@ -12,6 +12,7 @@ export function SelectAutoComplete() {
     options,
     register,
     selectedPerson,
+    handleListPersons,
     setOpen,
     setSelectedPerson,
   } = useSelectAutoComplete();
@@ -20,9 +21,6 @@ export function SelectAutoComplete() {
     <Autocomplete
       sx={{ width: 300 }}
       open={open}
-      onOpen={() => {
-        setOpen(true);
-      }}
       onClose={() => {
         setOpen(false);
       }}
@@ -34,7 +32,13 @@ export function SelectAutoComplete() {
       renderInput={(params) => (
         <TextField
           {...params}
-          {...register("pessoa", { setValueAs: () => selectedPerson })}
+          {...register("pessoa", {
+            setValueAs: () => selectedPerson,
+            onChange: () => {
+              setOpen(true);
+              handleListPersons();
+            },
+          })}
           label="Selecione uma pessoa"
           InputProps={{
             ...params.InputProps,
@@ -43,7 +47,6 @@ export function SelectAutoComplete() {
                 {loading ? (
                   <CircularProgress color="inherit" size={20} />
                 ) : null}
-                {params.InputProps.endAdornment}
               </>
             ),
           }}

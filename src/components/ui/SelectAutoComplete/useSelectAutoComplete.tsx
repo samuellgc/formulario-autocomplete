@@ -1,5 +1,5 @@
 import { useApi } from "@/hooks/useApi";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 interface Pessoa {
@@ -11,7 +11,7 @@ export function useSelectAutoComplete() {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState<readonly Pessoa[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<number | null>(null);
-  const loading = open && options.length === 0;
+  const [loading, setIsLoading] = useState<boolean>(false);
   const { register } = useFormContext();
   const { api } = useApi();
 
@@ -20,21 +20,13 @@ export function useSelectAutoComplete() {
     setOptions(data);
   };
 
-  useEffect(() => {
-    let active = true;
-
-    if (!loading) {
-      return undefined;
+  const handleListPersons = async () => {
+    if (options.length === 0) {
+      setIsLoading(true);
+      await fetchPersons();
+      setIsLoading(false);
     }
-
-    if (options.length === 0 && active) {
-      fetchPersons();
-    }
-
-    return () => {
-      active = false;
-    };
-  }, [loading]);
+  };
 
   return {
     open,
@@ -42,6 +34,7 @@ export function useSelectAutoComplete() {
     loading,
     options,
     setSelectedPerson,
+    handleListPersons,
     selectedPerson,
     register,
   };
